@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# Ver_0.0.1_0
+# Ver_0.0.1_2
 
 
 def main():
-    pass
+    print('It worked!')
 
 
 if __name__ == '__main__':
