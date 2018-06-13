@@ -1,20 +1,20 @@
 import sqlite3
 
 
-def create_user_table():
-    global cursor
-    table = "CREATE TABLE IF NOT EXISTS users (id int, username text, password text)"
+conn = sqlite3.connect(':memory:')
+c = conn.cursor()
 
-    cursor.execute(table)
-    user = (1, 'Testando', '123456')
+table = ("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username text, 
+            password text, premium int)""")
+c.execute(table)
 
-    insert_query = "INSERT INTO users VALUES (?, ?, ?)"
-    cursor.execute(insert_query, user)
-    return
+user = ("Testando", "123456", 0)
 
+insert_query = "INSERT INTO users VALUES (NULL, ?, ?, ?)"
+c.execute(insert_query, user)
 
-connection = sqlite3.connect("sscf.db")
-cursor = connection.cursor()
-create_user_table()
-connection.commit()
-connection.close()
+c.execute("SELECT * FROM users WHERE username=?", ('Testando',))
+
+print(c.fetchall())
+conn.commit()
+conn.close()

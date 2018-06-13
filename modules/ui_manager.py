@@ -2,14 +2,14 @@ from tkinter import *
 from tkinter.ttk import *
 
 
-window = Tk()
+window = Tk(screenName='main')
 
 
 def func():
     pass
 
 
-e1 = Label(window, text="Saint Seiya Cosmo Fantasy Compaion")
+e1 = Label(window, text="Say Whaaaaaaaat?")
 e1.grid(row=0, column=0)
 
 e2_value = StringVar()

@@ -2,9 +2,8 @@ import sqlite3
 
 
 class User(object):
-    TABLE_NAME = 'users'
 
-    def __init__(self, _id, username, password, premium=False):
+    def __init__(self, _id, username, password, premium):
         super().__init__()
         self.id = _id
         self.username = username
@@ -13,33 +12,28 @@ class User(object):
 
     @classmethod
     def find_by_username(cls, username):
-        connection = sqlite3.connect('sscf.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM {table} WHERE username=?".format(
-            table=cls.TABLE_NAME)
-        result = cursor.execute(query, (username,))
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        query = "SELECT * FROM users WHERE username=?"
+        result = c.execute(query, (username,))
         row = result.fetchone()
         if row:
             user = cls(*row)
         else:
             user = None
-
-        connection.close()
+        conn.close()
         return user
 
     @classmethod
     def find_by_id(cls, _id):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "SELECT * FROM {table} WHERE id=?".format(table=cls.TABLE_NAME)
-        result = cursor.execute(query, (_id,))
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        query = "SELECT * FROM users WHERE id=?"
+        result = c.execute(query, (_id,))
         row = result.fetchone()
         if row:
             user = cls(*row)
         else:
             user = None
-
-        connection.close()
+        conn.close()
         return user
