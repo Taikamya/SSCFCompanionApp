@@ -2,9 +2,11 @@ TODO
 
     Create base program -> 10%
 
-    Create database (sqlite3) -> 50%
+    Create database (sqlite3) -> 52%
 
-    Create interface (tkinter) -> 5%
+    # SCRATCHED! Create interface (tkinter) -> 10% #
+
+    Create UI (PyQt5) -> 5%
 
     Convert program into mobile App
 

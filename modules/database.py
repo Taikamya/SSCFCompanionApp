@@ -1,5 +1,4 @@
 import sqlite3
-# from pprint import pprint as pp
 
 
 def connect():
@@ -14,10 +13,10 @@ def connect():
 def view():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute("SELECT *  FROM users")
-    rows = c.fetchall()
+    c.execute("SELECT * FROM users ORDER BY id")
+    all_rows = c.fetchall()
     conn.close()
-    return rows
+    return all_rows
 
 
 def insert(username, password, premium=0):
@@ -54,13 +53,3 @@ def search(username=""):
 
 
 connect()
-# insert('Pablo Viado-Vittar', 'sougay24', 0)
-# insert('Dimi Lindo', 'soufoda69', 1)
-# insert('Evelynda', 'unicornios', 0)
-# insert('Tinha Matos', 'queroMato', 1)
-# print(f"Viewing the Database: {view()}")
-# print("Searching for user: %s \n" % search('Pablo'))
-# print(f"User {delete(1)} was deleted.")
-# print(f"Viewing the Database: {view()}")
-# update(4, 'Agostinha Matos', 'amoKiko')
-# print(f"User {search('Agostinha')} was just updated!")

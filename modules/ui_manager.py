@@ -1,8 +1,12 @@
-from tkinter import *
-from tkinter.ttk import *
-import modules.database as mdb
+# -*- coding: utf-8 -*-
+
 import sys
-# class WindowExec(object):
+from PyQt5.QtSql import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.Qt import QLabel, QPushButton
+from modules.database import *
 
 
 def get_selected_row(event):
@@ -20,86 +24,136 @@ def get_selected_row(event):
 
 def view_command():
     list1.delete(0, END)
-    for row in mdb.view():
+    for row in view():
         return list1.insert(END, row)
 
 
 def search_command():
     list1.delete(0, END)
-    for row in mdb.search(username_text.get()):
+    for row in search(username_text.get()):
         return list1.insert(END, row)
 
 
 def add_command():
-    mdb.insert(username_text.get(), password_text.get, premium_bool.get())
+    insert(username_text.get(), password_text.get(), premium_state.get())
     list1.delete(0, END)
-    return list1.insert(END, (username_text.get(), password_text.get, premium_bool.get()))
+    return list1.insert(END, (username_text.get(), password_text.get(), premium_state.get()))
 
 
 def update_command():
-    return mdb.update(selected_tuple[0], username_text.get(), password_text.get())
+    return update(selected_tuple[0], username_text.get(), password_text.get())
 
 
 def delete_command():
-    return mdb.delete(selected_tuple[0])
+    return delete(selected_tuple[0])
 
 
-window = Tk()
-window.title("SSCF Companion App")
+def premium_chk():
+    if premium_state.get() == 0:
+        premium_state.set(1)
+        return
+    else:
+        premium_state.set(0)
+        return
 
-l1 = Label(window, text="Username")
-l1.grid(column=0, row=0)
 
-l2 = Label(window, text="Password")
-l2.grid(column=0, row=1)
+class GUI(QMainWindow):
+    def __init__(self):
+        super().__init__()  # super class to create window
+        self.title = "SSCF Companion App"
+        self.layout_grid = LayoutGrid(self)
+        self.initUI()   # refers to the UI
+        self.menuStatus()  # refers to the menu status messages
+        self.menuBar()  # refers to the menu bar
+        self.menuMessage = self.statusBar().showMessage("Test Test Test")
 
-l3 = Label(window, text="Ok!")
-l3.grid(column=2, row=1)
+    def initUI(self):
+        self.resize(600, 360)  # resize widget
+        self.setWindowTitle(self.title)
+        self.setCentralWidget(self.layout_grid)
+        self.show()
 
-bar = Progressbar(window, length=200)
-bar.grid(column=3, row=8)
+    def menuStatus(self):
+        menu = self.menuBar()
+        new_menu = menu.addMenu("File")
+        file_icon = QIcon('./images/icons/new_icon.png')
+        fl_action = QAction(file_icon, "Load", self)
+        fl_action.setStatusTip("Load File")
+        new_menu.addAction(fl_action)
+        new_menu.addSeparator()
+        editMenu = menu.addMenu("Edit")
+        viewMenu = menu.addMenu("View")
+        searchMenu = menu.addMenu("Search")
+        toolsMenu = menu.addMenu("Tools")
+        helpMenu = menu.addMenu("Help")
 
-username_text = StringVar()
-e1 = Entry(window, textvariable=username_text)
-e1.grid(column=1, row=0)
+        find_icon = QIcon('./images/icons/new_icon.png')
+        find_action = QAction(find_icon, "Search", self)
+        find_action.triggered.connect(LayoutGrid.search_tab)
+        find_action.setShortcut('Ctrl+F')
+        new_menu.addAction(find_action)
 
-password_text = StringVar()
-e2 = Entry(window, textvariable=password_text)
-e2.grid(column=1, row=1)
+        exit_icon = QIcon('./images/icons/exit_icon.png')
+        exit_action = QAction(exit_icon, "Exit", self)
+        exit_action.setStatusTip("Exit Program")
+        exit_action.triggered.connect(self.close)
+        exit_action.setShortcut('Ctrl+Q')
+        new_menu.addAction(exit_action)
 
-premium_bool = BooleanVar()
-premium_bool.set(False)
-chk1 = Checkbutton(window, text="Premium", var=premium_bool)
-chk1.grid(column=2, row=0)
 
-list1 = Listbox(window, height=6, width=35)
-list1.grid(column=0, row=2, columnspan=2, rowspan=6)
-sb1 = Scrollbar(window)
-sb1.grid(column=2, row=2, rowspan=6)
+class LayoutGrid(QWidget):
+    def __init__(self, parent):
+        super(QWidget, self).__init__(parent)
+        self.layout = QVBoxLayout(self)
 
-list1.configure(yscrollcommand=sb1.set)
-sb1.configure(command=list1.yview)
+        # Initialize tab screen
+        self.tabs = QTabWidget()
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+        self.tab3 = QWidget()
+        self.tabs.resize(600, 360)
 
-list1.bind('<<Listbox>>', get_selected_row)
+        # Add tabs
+        self.tabs.addTab(self.tab1, "Home")
+        self.tabs.addTab(self.tab2, "Connection")
+        self.b3 = QPushButton("Search")
 
-b1 = Button(window, text="View All", width=14, command=view_command)
-b1.grid(column=3, row=2)
+        # Create first tab
+        self.tab1.layout = QVBoxLayout(self)
+        self.b1 = QPushButton("View Data")
+        self.tab1.layout.addWidget(self.b1)
+        self.b1.clicked.connect(view_command)
+        self.tab1.setLayout(self.tab1.layout)
 
-b2 = Button(window, text="Search", width=14, command=search_command)
-b2.grid(column=3, row=3)
+        # Create second tab
+        self.tab2.layout = QVBoxLayout(self)
+        self.b2 = QPushButton("Connect")
+        self.tab2.layout.addWidget(self.b2)
+        self.b2.clicked.connect(add_command)
+        self.tab2.setLayout(self.tab2.layout)
 
-b3 = Button(window, text="Add", width=14, command=add_command)
-b3.grid(column=3, row=4)
+        # Add tabs to widget
+        self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
 
-b4 = Button(window, text="Update Selected", width=14,
-            command=update_command)
-b4.grid(column=3, row=5)
+    def search_tab(self):
+        self.tabs.addTab(self.tab1, "Search")
+        # Create third tab
+        self.tab1.layout = QVBoxLayout(self)
+        self.tab1.layout.addWidget(self.b1)
+        self.b1.clicked.connect(search_command)
+        self.tab1.setLayout(self.tab1.layout)
 
-b5 = Button(window, text="Delete Selected", width=14,
-            command=delete_command)
-b5.grid(column=3, row=6)
+    @pyqtSlot()
+    def on_click(self):
+        print("\n")
+        for currentQTableWidgetItem in self.tableWidget.selectedItems():
+            print(currentQTableWidgetItem.row(),
+                  currentQTableWidgetItem.column(),
+                  currentQTableWidgetItem.text())
 
-b6 = Button(window, text="Close", width=14, command=sys.exit)
-b6.grid(column=3, row=7)
 
-window.mainloop()
+app = QApplication(sys.argv)
+gui = GUI()
+gui.show()
+sys.exit(app.exec_())
